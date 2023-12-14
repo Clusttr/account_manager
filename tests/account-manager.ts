@@ -22,7 +22,7 @@ describe("account-manager", () => {
 
     const fundAmount = new anchor.BN(LAMPORTS_PER_SOL)
       await program.methods
-        .fundRendVault(fundAmount)
+        .fundRentVault(fundAmount)
         .accounts({
           payer: payer.publicKey,
           rentVault: vaultAccount
@@ -53,4 +53,27 @@ describe("account-manager", () => {
 
       assert(minRentFreeLamports == accountInfo.lamports)
   })
+
+    it("withdraw from rent vault", async () => {
+        const withdrawAmount = new anchor.BN(LAMPORTS_PER_SOL)
+        const connection = program.provider.connection
+
+        const vaultInfo1 = await connection.getAccountInfo(vaultAccount)
+
+        await program.methods
+            .withdrawRentVault(withdrawAmount)
+            .accounts({
+                payer: payer.publicKey,
+                rentVault: vaultAccount
+            })
+            .signers([payer.payer])
+            .rpc()
+
+        const vaultInfo2 = await connection.getAccountInfo(vaultAccount)
+
+        console.log("vaultInfo1: ", vaultInfo1.lamports)
+        console.log("vaultInfo2: ", vaultInfo2.lamports)
+
+        console.assert(vaultInfo1.lamports > vaultInfo2.lamports)
+    })
 });

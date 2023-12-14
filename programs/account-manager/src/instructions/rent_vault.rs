@@ -12,7 +12,7 @@ pub struct FundRentVault<'info> {
     system_program: Program<'info, System>
 }
 
-pub fn fund_rend_vault(ctx: Context<FundRentVault>, fund_lamport: u64) -> Result<()> {
+pub fn fund_rent_vault(ctx: Context<FundRentVault>, fund_lamport: u64) -> Result<()> {
     transfer(
         CpiContext::new(
             ctx.accounts.system_program.to_account_info(),
@@ -22,5 +22,29 @@ pub fn fund_rend_vault(ctx: Context<FundRentVault>, fund_lamport: u64) -> Result
             }
         ),
         fund_lamport
+    )
+}
+
+#[derive(Accounts)]
+pub struct WithdrawRentVault<'info> {
+    #[account(mut)]
+    payer: Signer<'info>,
+
+    #[account(mut, seeds =[constants::VAULT_SEED], bump)]
+    rent_vault: SystemAccount<'info>,
+    system_program: Program<'info, System>
+}
+
+pub fn withdraw_rent_vault(ctx: Context<WithdrawRentVault>, withdraw_lamport: u64) -> Result<()> {
+    let signer: &[&[&[u8]]] = &[&[constants::VAULT_SEED, &[*ctx.bumps.get("rent_vault").unwrap()]]];
+    transfer(
+        CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.rent_vault.to_account_info(),
+                to: ctx.accounts.payer.to_account_info(),
+            }
+        ).with_signer(signer),
+        withdraw_lamport
     )
 }
