@@ -1,5 +1,6 @@
 {
     "scripts": {
+        "main": "ts-node app/main.ts",
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
     },
