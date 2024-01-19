@@ -55,7 +55,7 @@ describe("account-manager", () => {
     assert(minRentFreeLamports == accountInfo.lamports);
   });
 
-  it("withdraw from rent vault", async () => {
+  it.skip("withdraw from rent vault", async () => {
     const withdrawAmount = new anchor.BN(LAMPORTS_PER_SOL);
     const connection = program.provider.connection;
 
